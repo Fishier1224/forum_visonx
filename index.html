@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Forum</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="registerContainer">
+    <h2>Register</h2>
+    <input type="text" id="registerUsername" placeholder="Enter username">
+    <input type="password" id="registerPassword" placeholder="Enter password">
+    <button onclick="register()">Register</button>
+  </div>
+  
+  <div id="loginContainer">
+    <h2>Login</h2>
+    <input type="text" id="loginUsername" placeholder="Enter username">
+    <input type="password" id="loginPassword" placeholder="Enter password">
+    <button onclick="login()">Login</button>
+  </div>
+  
+  <div id="forumContainer" style="display:none;">
+    <h1>Simple Forum</h1>
+    
+    <div id="postQuestion">
+      <h2>Post a Question</h2>
+      <input type="text" id="questionTitle" placeholder="Question title">
+      <textarea id="questionContent" placeholder="Question content"></textarea>
+      <button onclick="postQuestion()">Post Question</button>
+    </div>
+    
+    <div id="questions">
+      <h2>Questions</h2>
+      <ul id="questionList"></ul>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
