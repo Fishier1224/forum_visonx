@@ -42,6 +42,7 @@ async function login() {
 
     const result = await response.json();
     if (response.ok) {
+      document.getElementById('registerContainer').style.display = 'none';
       document.getElementById('loginContainer').style.display = 'none';
       document.getElementById('forumContainer').style.display = 'block';
       document.getElementById('forumContainer').setAttribute('data-username', username);
@@ -56,32 +57,43 @@ async function login() {
 }
 
 
+
+
 async function postQuestion() {
   const title = document.getElementById('questionTitle').value;
   const content = document.getElementById('questionContent').value;
   const token = localStorage.getItem('token');
 
   if (title && content && token) {
-    const response = await fetch(`${apiBaseUrl}/questions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ title, content })
-    });
+    try {
+      const response = await fetch(`${apiBaseUrl}/questions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ title, content })
+      });
 
-    if (response.ok) {
-      displayQuestions();
-      document.getElementById('questionTitle').value = '';
-      document.getElementById('questionContent').value = '';
-    } else {
+      if (response.ok) {
+        displayQuestions();
+        document.getElementById('questionTitle').value = '';
+        document.getElementById('questionContent').value = '';
+      } else {
+        const error = await response.json();
+        console.error('Failed to post question:', error);
+        alert('Failed to post question');
+      }
+    } catch (error) {
+      console.error('Error posting question:', error);
       alert('Failed to post question');
     }
   } else {
     alert('Please enter both title and content');
   }
 }
+
+
 
 async function displayQuestions() {
   try {
@@ -100,7 +112,11 @@ async function displayQuestions() {
           <div class="comments">
             <h4>Comments</h4>
             <ul id="commentList${question._id}">
-              ${question.comments.map(comment => `<li class="comment">${comment.username}: ${comment.comment}</li>`).join('')}
+              ${question.comments.map(comment => `
+                <li class="comment">
+                  ${comment.username}: ${comment.comment} <br>
+                  <small>${new Date(comment.createdAt).toLocaleString()}</small>
+                </li>`).join('')}
             </ul>
             <input type="text" id="commentInput${question._id}" placeholder="Add a comment">
             <button onclick="addComment('${question._id}')">Add Comment</button>
@@ -114,29 +130,38 @@ async function displayQuestions() {
   }
 }
 
-
 async function addComment(questionId) {
   const commentInput = document.getElementById(`commentInput${questionId}`);
   const commentText = commentInput.value;
   const token = localStorage.getItem('token');
 
   if (commentText && token) {
-    const response = await fetch(`${apiBaseUrl}/questions/${questionId}/comments`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ comment: commentText })
-    });
+    try {
+      const response = await fetch(`${apiBaseUrl}/questions/${questionId}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ comment: commentText })
+      });
 
-    if (response.ok) {
-      displayQuestions();
-      commentInput.value = '';
-    } else {
+      const responseBody = await response.json();
+
+      if (response.ok) {
+        displayQuestions();
+        commentInput.value = '';
+      } else {
+        console.error('Failed to add comment:', responseBody);
+        alert('Failed to add comment');
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
       alert('Failed to add comment');
     }
   } else {
     alert('Please enter a comment');
   }
 }
+
+

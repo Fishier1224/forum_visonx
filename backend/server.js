@@ -29,8 +29,13 @@ const questionSchema = new mongoose.Schema({
   title: String,
   content: String,
   username: String,
-  comments: [{ username: String, comment: String }]
+  comments: [{
+    username: String,
+    comment: String,
+    createdAt: { type: Date, default: Date.now }
+  }]
 });
+
 
 const User = mongoose.model('User', userSchema);
 const Question = mongoose.model('Question', questionSchema);
@@ -66,7 +71,8 @@ app.post('/login', async (req, res) => {
 });
 
 app.post('/questions', async (req, res) => {
-  const { title, content, token } = req.body;
+  const { title, content } = req.body;
+  const token = req.headers['authorization'].split(' ')[1];
 
   try {
     const decoded = jwt.verify(token, 'your_jwt_secret');
@@ -79,6 +85,7 @@ app.post('/questions', async (req, res) => {
     await question.save();
     res.status(201).send(question);
   } catch (error) {
+    console.error('Error posting question:', error);
     res.status(400).send(error);
   }
 });
@@ -93,21 +100,27 @@ app.get('/questions', async (req, res) => {
 });
 
 app.post('/questions/:id/comments', async (req, res) => {
-  const { comment, token } = req.body;
+  const { comment } = req.body;
+  const token = req.headers['authorization'].split(' ')[1];
 
   try {
     const decoded = jwt.verify(token, 'your_jwt_secret');
     const question = await Question.findById(req.params.id);
     question.comments.push({
       username: decoded.username,
-      comment
+      comment,
+      createdAt: new Date()
     });
     await question.save();
     res.status(201).send(question);
   } catch (error) {
-    res.status(400).send(error);
+    console.error('Error adding comment:', error);
+    res.status(400).send({ error: 'Failed to add comment', details: error });
   }
 });
+
+
+
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../index.html'));
