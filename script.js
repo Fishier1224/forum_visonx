@@ -93,8 +93,6 @@ async function postQuestion() {
   }
 }
 
-
-
 async function displayQuestions() {
   try {
     const response = await fetch(`${apiBaseUrl}/questions`);
@@ -105,21 +103,37 @@ async function displayQuestions() {
 
       questions.forEach(question => {
         const li = document.createElement('li');
+        li.className = "list-group-item mb-3";
         li.innerHTML = `
-          <h3>${question.title}</h3>
-          <p>${question.content}</p>
-          <p><small>Posted by ${question.username}</small></p>
-          <div class="comments">
-            <h4>Comments</h4>
-            <ul id="commentList${question._id}">
-              ${question.comments.map(comment => `
-                <li class="comment">
-                  ${comment.username}: ${comment.comment} <br>
-                  <small>${new Date(comment.createdAt).toLocaleString()}</small>
-                </li>`).join('')}
-            </ul>
-            <input type="text" id="commentInput${question._id}" placeholder="Add a comment">
-            <button onclick="addComment('${question._id}')">Add Comment</button>
+          <div class="media">
+            <img src="https://via.placeholder.com/50" class="mr-3 rounded-circle" alt="User Avatar">
+            <div class="media-body">
+              <h5 class="mt-0">${question.title}</h5>
+              <p>${question.content}</p>
+              <p><small>Posted by ${question.username}</small></p>
+              <div class="comments">
+                <h6>Comments</h6>
+                <ul id="commentList${question._id}" class="list-group">
+                  ${question.comments.map(comment => `
+                    <li class="list-group-item">
+                      <div class="media">
+                        <img src="https://via.placeholder.com/30" class="mr-3 rounded-circle" alt="User Avatar">
+                        <div class="media-body">
+                          <p class="mb-0">${comment.username}: ${comment.comment}</p>
+                          <small>${new Date(comment.createdAt).toLocaleString()}</small>
+                        </div>
+                      </div>
+                    </li>
+                  `).join('')}
+                </ul>
+                <div class="input-group mt-3">
+                  <input type="text" id="commentInput${question._id}" class="form-control" placeholder="Add a comment">
+                  <div class="input-group-append">
+                    <button onclick="addComment('${question._id}')" class="btn btn-outline-secondary">Add Comment</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         `;
         questionList.appendChild(li);
@@ -129,6 +143,7 @@ async function displayQuestions() {
     console.error('Failed to fetch questions', error);
   }
 }
+
 
 async function addComment(questionId) {
   const commentInput = document.getElementById(`commentInput${questionId}`);
