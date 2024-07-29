@@ -4,73 +4,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 const apiBaseUrl = 'http://localhost:3000';
 
-async function register() {
-  const username = document.getElementById('registerUsername').value;
-  const password = document.getElementById('registerPassword').value;
-
-  if (username && password) {
-    const response = await fetch(`${apiBaseUrl}/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username, password })
-    });
-
-    if (response.ok) {
-      alert('Registration successful. Please login.');
-    } else {
-      alert('Registration failed');
-    }
-  } else {
-    alert('Please enter both username and password');
-  }
-}
-
-async function login() {
-  const username = document.getElementById('loginUsername').value;
-  const password = document.getElementById('loginPassword').value;
-
-  if (username && password) {
-    const response = await fetch(`${apiBaseUrl}/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ username, password })
-    });
-
-    const result = await response.json();
-    if (response.ok) {
-      document.getElementById('registerContainer').style.display = 'none';
-      document.getElementById('loginContainer').style.display = 'none';
-      document.getElementById('forumContainer').style.display = 'block';
-      document.getElementById('forumContainer').setAttribute('data-username', username);
-      localStorage.setItem('token', result.token);
-      displayQuestions(); // Fetch and display questions after login
-    } else {
-      alert(result.message || 'Login failed');
-    }
-  } else {
-    alert('Please enter both username and password');
-  }
-}
-
-
-
-
 async function postQuestion() {
   const title = document.getElementById('questionTitle').value;
   const content = document.getElementById('questionContent').value;
-  const token = localStorage.getItem('token');
 
-  if (title && content && token) {
+  if (title && content) {
     try {
       const response = await fetch(`${apiBaseUrl}/questions`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ title, content })
       });
@@ -110,7 +53,7 @@ async function displayQuestions() {
             <div class="media-body">
               <h5 class="mt-0">${question.title}</h5>
               <p>${question.content}</p>
-              <p><small>Posted by ${question.username}</small></p>
+              <p><small>Posted by Anonymous</small></p>
               <div class="comments">
                 <h6>Comments</h6>
                 <ul id="commentList${question._id}" class="list-group">
@@ -119,7 +62,7 @@ async function displayQuestions() {
                       <div class="media">
                         <img src="https://via.placeholder.com/30" class="mr-3 rounded-circle" alt="User Avatar">
                         <div class="media-body">
-                          <p class="mb-0">${comment.username}: ${comment.comment}</p>
+                          <p class="mb-0">Anonymous: ${comment.comment}</p>
                           <small>${new Date(comment.createdAt).toLocaleString()}</small>
                         </div>
                       </div>
@@ -144,19 +87,16 @@ async function displayQuestions() {
   }
 }
 
-
 async function addComment(questionId) {
   const commentInput = document.getElementById(`commentInput${questionId}`);
   const commentText = commentInput.value;
-  const token = localStorage.getItem('token');
 
-  if (commentText && token) {
+  if (commentText) {
     try {
       const response = await fetch(`${apiBaseUrl}/questions/${questionId}/comments`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ comment: commentText })
       });
@@ -178,5 +118,3 @@ async function addComment(questionId) {
     alert('Please enter a comment');
   }
 }
-
-
