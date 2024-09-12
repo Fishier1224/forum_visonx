@@ -49,7 +49,7 @@ async function displayQuestions() {
         li.className = "list-group-item mb-3";
         li.innerHTML = `
           <div class="media">
-            <img src="https://via.placeholder.com/50" class="mr-3 rounded-circle" alt="User Avatar">
+            <img src="img/question.png" class="mr-3 rounded-circle" alt="User Avatar">
             <div class="media-body">
               <h5 class="mt-0">${question.title}</h5>
               <p>${question.content}</p>
@@ -60,7 +60,7 @@ async function displayQuestions() {
                   ${question.comments.map(comment => `
                     <li class="list-group-item">
                       <div class="media">
-                        <img src="https://via.placeholder.com/30" class="mr-3 rounded-circle" alt="User Avatar">
+                        <img src="img/answer.png" class="mr-3 rounded-circle" alt="User Avatar">
                         <div class="media-body">
                           <p class="mb-0">Anonymous: ${comment.comment}</p>
                           <small>${new Date(comment.createdAt).toLocaleString()}</small>
